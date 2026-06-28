@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -22,7 +22,7 @@ type Prediction = {
   points: number
 }
 
-export default function MatchesPage() {
+function MatchesContent() {
   const [matches, setMatches] = useState<Match[]>([])
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({})
   const [drafts, setDrafts] = useState<Record<string, { home: string; away: string }>>({})
@@ -128,7 +128,7 @@ export default function MatchesPage() {
         <div className="space-y-4">
           {matches.map(match => {
             const locked = isLocked(match.kickoff_at)
-            const pred = predictions[match.match_id] || predictions[match.id]
+            const pred = predictions[match.id]
             const hasDraft = drafts[match.id]?.home !== undefined && drafts[match.id]?.away !== undefined
 
             return (
@@ -202,5 +202,13 @@ export default function MatchesPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function MatchesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-950 flex items-center justify-center text-white">Chargement...</div>}>
+      <MatchesContent />
+    </Suspense>
   )
 }
