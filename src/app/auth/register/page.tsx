@@ -27,16 +27,22 @@ export default function RegisterPage() {
       options: { data: { username } },
     })
 
+    console.log('signUp result:', JSON.stringify({ data, error }))
+
     if (error) {
-      setError(error.message || 'Une erreur est survenue. Réessaie.')
+      setError(error.message || JSON.stringify(error) || 'Erreur inconnue')
       setLoading(false)
-    } else if (data.user && !data.session) {
-      setError('Vérifie ta boîte mail pour confirmer ton compte.')
-      setLoading(false)
-    } else {
-      router.push('/dashboard')
-      router.refresh()
+      return
     }
+
+    if (!data.session) {
+      setError('Confirme ton email avant de te connecter.')
+      setLoading(false)
+      return
+    }
+
+    router.push('/dashboard')
+    router.refresh()
   }
 
   return (
