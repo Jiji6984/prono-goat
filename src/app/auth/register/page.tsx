@@ -21,14 +21,17 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { username } },
     })
 
     if (error) {
-      setError(error.message)
+      setError(error.message || 'Une erreur est survenue. Réessaie.')
+      setLoading(false)
+    } else if (data.user && !data.session) {
+      setError('Vérifie ta boîte mail pour confirmer ton compte.')
       setLoading(false)
     } else {
       router.push('/dashboard')
